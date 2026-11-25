@@ -24,7 +24,7 @@ public class CharacterSelection : MonoBehaviour
     //Botónes
     bool pressRight = false;
     bool pressLeft = false;
-
+    //aaaaa
     private void Start()
     {
         //SI LLEGAMOS A AÑADIR MAS PERSONAJES,TENDREMOS QUE CAMBIAR ESTO POR UN BUCLE PORQUE ME DA 
