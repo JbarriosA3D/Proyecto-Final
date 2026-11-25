@@ -5,7 +5,7 @@ using UnityEngine.TextCore.Text;
 
 //                                        ******IMPORTANTE****** 
 //*******PONER DEBAJO DE ESTO FECHA Y HORA DE LA ÚLTIMA EDICIÓN, PARA EVITAR CONFUSIONES. GRACIAS :D*****
-//                                       ******<25/11 - 2:09>******
+//                                       ******<25/11 - 2:30>******
 //P.D: Si no lo poneis, ¡HAY TABLA!
 public class CharacterSelection : MonoBehaviour
 {
@@ -13,6 +13,7 @@ public class CharacterSelection : MonoBehaviour
     Vector3 targetRot;
     Vector3 currentAngle;
     int currentCharacter;
+    public float rotSpeed = 1.0f;
 
     //Escalar el personaje que esta delante
     public Transform[] charactersScale;
@@ -91,7 +92,7 @@ public class CharacterSelection : MonoBehaviour
             currentAngle = transform.eulerAngles;
             targetRot = targetRot - new Vector3(0, 90, 0);
         }
-        currentAngle = new Vector3(0, Mathf.LerpAngle(currentAngle.y, targetRot.y, 5.0f * Time.deltaTime), 0);
+        currentAngle = new Vector3(0, Mathf.LerpAngle(currentAngle.y, targetRot.y, Time.deltaTime * rotSpeed), 0);
         transform.eulerAngles = currentAngle;
 
         //Creamos un bucle para escalar o deescdalar los personajes. Esto comprobará personaje por personaje y verá si coincide con el current character
