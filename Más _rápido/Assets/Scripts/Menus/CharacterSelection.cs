@@ -69,6 +69,8 @@ public class CharacterSelection : MonoBehaviour
     public void ConfirmSelection()
     {
         //Guardar selección(ignorar de momento)
+        PlayerPrefs.SetInt("selectedCharacter", currentCharacter);
+
 
         //Cargar Juego
         SceneManager.LoadScene("GAME");
