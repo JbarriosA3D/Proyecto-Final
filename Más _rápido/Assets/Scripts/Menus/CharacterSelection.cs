@@ -1,3 +1,4 @@
+using NUnit.Framework.Constraints;
 using TMPro;
 using Unity.Mathematics;
 using UnityEngine;
@@ -35,7 +36,10 @@ public class CharacterSelection : MonoBehaviour
     Vector3 cameraTargetRot;
     Vector3 cameraOriginRot;
     public float cameraRotSpeed = 1.0f;
+    public Transform spawnPoint;
+    GameObject clon;
 
+    GameObject prefab;
     private void Start()
     {
         //SI LLEGAMOS A AÑADIR MAS PERSONAJES,TENDREMOS QUE CAMBIAR ESTO POR UN BUCLE PORQUE ME DA 
@@ -55,8 +59,18 @@ public class CharacterSelection : MonoBehaviour
         //Guardar la posicion original de la cámara
         cameraOriginRot = camera.eulerAngles;
         //cameraTargetRot = new Vector3(0, 180, 0);
+
+        //Crear el clon que se verá en la segunda pantalla
+        prefab = charactersScale[currentCharacter].gameObject;
+        clon = Instantiate(prefab, spawnPoint.position, Quaternion.identity);
+        clon.transform.localScale = new Vector3(0.6f, 0.6f, 0.6f);
     }
 
+    public void ChangeModel()
+    {
+        prefab = charactersScale[currentCharacter].gameObject;
+        clon = Instantiate(prefab, spawnPoint.position, Quaternion.identity);
+    }
 
     //Creamos las dos funciones de los botones para cambiar de personaje, Right & Left
     public void Right()
@@ -68,6 +82,8 @@ public class CharacterSelection : MonoBehaviour
             currentCharacter = 0;
         }
         Debug.Log(currentCharacter);
+        Destroy(clon);
+        ChangeModel();
     }
     public void Left()
     {
@@ -78,6 +94,8 @@ public class CharacterSelection : MonoBehaviour
             currentCharacter = 3;
         }
         Debug.Log(currentCharacter);
+        Destroy(clon);
+        ChangeModel();
     }
 
     //Creamos la funcion para confirmar la selección de personaje
@@ -122,18 +140,26 @@ public class CharacterSelection : MonoBehaviour
         //Rotar los personajes
         if (pressRight)
         {
-            pressRight = false;
+            //pressRight = false;
             currentAngle = transform.eulerAngles;
             targetRot = targetRot + new Vector3(0, 90, 0);
         }
         if (pressLeft)
         {
-            pressLeft = false;
+            //pressLeft = false;
             currentAngle = transform.eulerAngles;
-            targetRot = targetRot - new Vector3(0, 90, 0);
+            targetRot = targetRot - new Vector3(0, 90, 0);  
         }
+        
         currentAngle = new Vector3(0, Mathf.LerpAngle(currentAngle.y, targetRot.y, Time.deltaTime * rotSpeed), 0);
         transform.eulerAngles = currentAngle;
+        if (Quaternion.Angle(transform.rotation, Quaternion.Euler(targetRot)) > 0.1f)
+        {
+            pressRight = false;
+            pressLeft = false;
+        }
+
+
 
         //Creamos un bucle para escalar o deescdalar los personajes. Esto comprobará personaje por personaje y verá si coincide con el current character
         //Si coincide, lo agrandará, si no, lo dejará en pequeño
@@ -148,6 +174,8 @@ public class CharacterSelection : MonoBehaviour
                 charactersScale[i].localScale = Vector3.Lerp(charactersScale[i].localScale, new Vector3(1,1,1) * normalScale, scaleSpeed * Time.deltaTime);
             }
         }
+
+        //Rota cámara
         if (rotateIndicator || backIndicator)
         {
             camera.eulerAngles = Vector3.Lerp(camera.eulerAngles, cameraTargetRot, Time.deltaTime * cameraRotSpeed);
