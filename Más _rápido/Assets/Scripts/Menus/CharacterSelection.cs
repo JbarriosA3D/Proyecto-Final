@@ -1,11 +1,12 @@
 using TMPro;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TextCore.Text;
 
 //                                        ******IMPORTANTE****** 
 //*******PONER DEBAJO DE ESTO FECHA Y HORA DE LA ÚLTIMA EDICIÓN, PARA EVITAR CONFUSIONES. GRACIAS :D*****
-//                                       ******<25/11 - 2:30>******
+//                                       ******<27/11 - 3:47>******
 //P.D: Si no lo poneis, ¡HAY TABLA!
 public class CharacterSelection : MonoBehaviour
 {
@@ -24,7 +25,17 @@ public class CharacterSelection : MonoBehaviour
     //Botónes
     bool pressRight = false;
     bool pressLeft = false;
-    //aaaaa
+
+    //Cambio de interfaces
+    bool backIndicator = false;
+    bool rotateIndicator = false;
+    public Transform camera;
+    public GameObject selectorCanvas;
+    public GameObject infoPanel;
+    Vector3 cameraTargetRot;
+    Vector3 cameraOriginRot;
+    public float cameraRotSpeed = 1.0f;
+
     private void Start()
     {
         //SI LLEGAMOS A AÑADIR MAS PERSONAJES,TENDREMOS QUE CAMBIAR ESTO POR UN BUCLE PORQUE ME DA 
@@ -40,6 +51,10 @@ public class CharacterSelection : MonoBehaviour
         currentCharacter = 0;
         //Solo para comprobar que se esta cambiando bien el currentCharacter
         Debug.Log(currentCharacter);
+
+        //Guardar la posicion original de la cámara
+        cameraOriginRot = camera.eulerAngles;
+        //cameraTargetRot = new Vector3(0, 180, 0);
     }
 
 
@@ -66,14 +81,37 @@ public class CharacterSelection : MonoBehaviour
     }
 
     //Creamos la funcion para confirmar la selección de personaje
+    public void Selection()
+    {
+        //comprobar
+        Debug.Log(currentCharacter);
+
+        //Desactivar canvas de selector
+        selectorCanvas.SetActive(false);
+
+        //Rotar cámara
+        rotateIndicator = true;
+
+        //Activar info
+        infoPanel.SetActive(true);
+        cameraTargetRot = new Vector3(0, 180, 0);
+
+
+    }
     public void ConfirmSelection()
     {
-        //Guardar selección(ignorar de momento)
         PlayerPrefs.SetInt("selectedCharacter", currentCharacter);
-
-
-        //Cargar Juego
         SceneManager.LoadScene("GAME");
+    }
+
+    public void ComeBack()
+    {
+        backIndicator = true;
+        rotateIndicator = false;
+        cameraTargetRot = cameraOriginRot;
+
+        infoPanel.SetActive(false);
+        selectorCanvas.SetActive(true);
     }
 
     //Para hacer el movimiento con las flechas en lugar de click remplazamos dentro del if lo que hay dentro y ponemos esto:
@@ -109,6 +147,15 @@ public class CharacterSelection : MonoBehaviour
             {
                 charactersScale[i].localScale = Vector3.Lerp(charactersScale[i].localScale, new Vector3(1,1,1) * normalScale, scaleSpeed * Time.deltaTime);
             }
+        }
+        if (rotateIndicator || backIndicator)
+        {
+            camera.eulerAngles = Vector3.Lerp(camera.eulerAngles, cameraTargetRot, Time.deltaTime * cameraRotSpeed);
+        }
+        if (Quaternion.Angle(camera.rotation, Quaternion.Euler(cameraTargetRot)) < 0.1f)
+        {
+            rotateIndicator = false;
+            backIndicator = false;
         }
     }
 }
